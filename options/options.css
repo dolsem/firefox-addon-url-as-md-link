@@ -1,0 +1,13 @@
+.panel-section {
+  height: 100vh;
+}
+label, input {
+  color: var(--in-content-text-color) !important;
+}
+::placeholder {
+  color: var(--in-content-deemphasized-text);
+  opacity: 1;
+}
+#label-toggle {
+  margin-right: 6px;
+}
