@@ -11,7 +11,7 @@
   },
 
   "page_action": {
-    "default_icon": "icons/off.svg",
+    "default_icon": "icons/copy-link.svg",
     "browser_style": true
   },
 
