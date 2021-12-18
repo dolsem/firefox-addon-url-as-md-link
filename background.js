@@ -18,6 +18,25 @@ function initializePageAction(tab) {
 }
 
 /*
+Wrap a listener and pass an extra boolean argument to detect double clicks
+*/
+function createDoubleClickListener(listener) {
+  let timeout;
+  return (...args) => {
+    if (!timeout) {
+      timeout = setTimeout(() => {
+        timeout = null;
+        listener(...args, false);
+      }, 500);
+    } else {
+      clearTimeout(timeout);
+      timeout = null;
+      listener(...args, true);
+    }
+  }
+}
+
+/*
 When first loaded, initialize the page action for all tabs.
 */
 var gettingAllTabs = browser.tabs.query({});
@@ -43,14 +62,16 @@ browser.storage.onChanged.addListener((changes, area) => {
   })
 })
 
-browser.pageAction.onClicked.addListener((tab) => {
-  if (!settings) return;
-  const { label, labelEnabled } = settings;
+browser.pageAction.onClicked.addListener(
+  createDoubleClickListener((tab, onClickData, doubleClick) => {
+    if (!settings) return;
+    const { label, labelEnabled } = settings;
 
-  if (labelEnabled) copyUrl({ label, href: tab.url });
-  else {
-    browser.tabs.executeScript({
-      code: `browser.runtime.sendMessage({ label: window.prompt('Enter label:'), href: '${tab.url}' });`
-    });
-  }
-});
+    if (labelEnabled && !doubleClick) copyUrl({ label, href: tab.url });
+    else {
+      browser.tabs.executeScript({
+        code: `browser.runtime.sendMessage({ label: window.prompt('Enter label:'), href: '${tab.url}' });`
+      });
+    }
+  })
+);
